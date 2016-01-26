@@ -6,3 +6,4 @@
 tmp/
 node_modules/
 settings.json
+public/.well-known
