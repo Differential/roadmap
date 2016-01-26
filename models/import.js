@@ -372,14 +372,14 @@ class TrelloCreator {
   getColor(trelloColorCode) {
     // trello color name => wekan color
     const mapColors = {
-      'blue': 'belize',
+      'blue': 'midnight',
       'orange': 'pumpkin',
       'green': 'nephritis',
       'red': 'pomegranate',
       'purple': 'wisteria',
       'pink': 'pomegranate',
       'lime': 'nephritis',
-      'sky': 'belize',
+      'sky': 'midnight',
       'grey': 'midnight',
     };
     const wekanColor = mapColors[trelloColorCode];
