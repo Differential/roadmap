@@ -139,7 +139,7 @@ tracker@1.0.9
 ui@1.0.8
 underscore@1.0.4
 url@1.0.5
-useraccounts:core@1.13.0
+useraccounts:core@1.13.1
 useraccounts:flow-routing@1.13.0
 useraccounts:unstyled@1.13.0
 verron:autosize@3.0.8
