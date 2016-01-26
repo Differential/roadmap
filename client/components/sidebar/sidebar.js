@@ -18,7 +18,8 @@ BlazeComponent.extendComponent({
   },
 
   onCreated() {
-    this._isOpen = new ReactiveVar(!Session.get('currentCard'));
+    const initOpen = Utils.isMiniScreen() ? false : (!Session.get('currentCard'));
+    this._isOpen = new ReactiveVar(initOpen);
     this._view = new ReactiveVar(defaultView);
     Sidebar = this;
   },
@@ -96,6 +97,7 @@ BlazeComponent.extendComponent({
     // XXX Hacky, we need some kind of `super`
     const mixinEvents = this.getMixin(Mixins.InfiniteScrolling).events();
     return [...mixinEvents, {
+      'click .js-hide-sidebar': this.hide,
       'click .js-toggle-sidebar': this.toggle,
       'click .js-back-home': this.setView,
     }];
@@ -129,9 +131,12 @@ Template.memberPopup.events({
   },
   'click .js-change-role': Popup.open('changePermissions'),
   'click .js-remove-member': Popup.afterConfirm('removeMember', function() {
-    const currentBoard = Boards.findOne(Session.get('currentBoard'));
+    const boardId = Session.get('currentBoard');
     const memberId = this.userId;
-    currentBoard.removeMember(memberId);
+    Cards.find({ boardId, members: memberId }).forEach((card) => {
+      card.unassignMember(memberId);
+    });
+    Boards.findOne(boardId).removeMember(memberId);
     Popup.close();
   }),
   'click .js-leave-member'() {
@@ -190,9 +195,6 @@ Template.labelsWidget.events({
 // autorun function and register a dependency on the both members and labels
 // fields of the current board document.
 function draggableMembersLabelsWidgets() {
-  if (!Meteor.user() || !Meteor.user().isBoardMember())
-    return;
-
   this.autorun(() => {
     const currentBoardId = Tracker.nonreactive(() => {
       return Session.get('currentBoard');
@@ -204,7 +206,8 @@ function draggableMembersLabelsWidgets() {
       },
     });
     Tracker.afterFlush(() => {
-      this.$('.js-member,.js-label').draggable({
+      const $draggables = this.$('.js-member,.js-label');
+      $draggables.draggable({
         appendTo: 'body',
         helper: 'clone',
         revert: 'invalid',
@@ -214,6 +217,14 @@ function draggableMembersLabelsWidgets() {
         start() {
           EscapeActions.executeUpTo('popup-back');
         },
+      });
+
+      function userIsMember() {
+        return Meteor.user() && Meteor.user().isBoardMember();
+      }
+
+      this.autorun(() => {
+        $draggables.draggable('option', 'disabled', !userIsMember());
       });
     });
   });

@@ -15,6 +15,18 @@ Template.boardMenuPopup.events({
   }),
 });
 
+Template.boardMenuPopup.helpers({
+  exportUrl() {
+    const boardId = Session.get('currentBoard');
+    const loginToken = Accounts._storedLoginToken();
+    return Meteor.absoluteUrl(`api/boards/${boardId}?authToken=${loginToken}`);
+  },
+  exportFilename() {
+    const boardId = Session.get('currentBoard');
+    return `wekan-export-board-${boardId}.json`;
+  },
+});
+
 Template.boardChangeTitlePopup.events({
   submit(evt, tpl) {
     const newTitle = tpl.$('.js-board-name').val().trim();
@@ -37,6 +49,10 @@ BlazeComponent.extendComponent({
     const boardId = Session.get('currentBoard');
     const user = Meteor.user();
     return user && user.hasStarred(boardId);
+  },
+
+  isMiniScreen() {
+    return Utils.isMiniScreen();
   },
 
   // Only show the star counter if the number of star is greater than 2
