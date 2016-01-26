@@ -1,0 +1,9 @@
+{
+  "email": {
+    "from": "Differential <hello@differential.com>",
+    "siteName": "Roadmap"
+  },
+  "mailgun": {
+    "smtp": "XXX"
+  }
+}
